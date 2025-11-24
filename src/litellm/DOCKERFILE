@@ -17,8 +17,11 @@ RUN --mount=type=cache,target=${HOME}/.cache/pip \
     ${HOME}/venv/bin/pip install -r requirements.txt
 
 COPY config.yaml .
+COPY entrypoint.sh .
+
+RUN chmod +x entrypoint.sh
 
 EXPOSE 80/tcp
 
-ENTRYPOINT ["litellm"]
+ENTRYPOINT ["./entrypoint.sh"]
 CMD ["--port", "80", "--config", "config.yaml"]

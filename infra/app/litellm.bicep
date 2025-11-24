@@ -7,8 +7,21 @@ param tags object = {}
 @description('Name of the Container Apps managed environment.')
 param containerAppsEnvironmentName string
 
-@description('Connection string for PostgreSQL. Use secure parameter.')
-param postgresqlConnectionString string
+@description('PostgreSQL database host.')
+param databaseHost string
+
+@description('PostgreSQL database port.')
+param databasePort string
+
+@description('PostgreSQL database name.')
+param databaseName string
+
+@description('PostgreSQL database user.')
+param databaseUser string
+
+@description('PostgreSQL database password.')
+@secure()
+param databasePassword string
 
 @description('Name for the App.')
 param name string
@@ -157,10 +170,24 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
           // keyVaultUrl: 'https://${keyvault.name}.vault.azure.net/secrets/${keyvaultSecretSaltKey.outputs.secretName}'
         }
         {
-          name: 'database-url'
-          value: postgresqlConnectionString
-          // identity: identity.id
-          // keyVaultUrl: 'https://${keyvault.name}.vault.azure.net/secrets/${keyVaultSecretPostgreSQLConnectionString.outputs.secretName}'
+          name: 'db-host'
+          value: databaseHost
+        }
+        {
+          name: 'db-port'
+          value: databasePort
+        }
+        {
+          name: 'db-name'
+          value: databaseName
+        }
+        {
+          name: 'db-user'
+          value: databaseUser
+        }
+        {
+          name: 'db-password'
+          value: databasePassword
         }
       ]
     }
@@ -179,8 +206,24 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
               secretRef: 'litellm-salt-key'
             }
             {
-              name: 'DATABASE_URL'
-              secretRef: 'database-url'
+              name: 'DB_HOST'
+              secretRef: 'db-host'
+            }
+            {
+              name: 'DB_PORT'
+              secretRef: 'db-port'
+            }
+            {
+              name: 'DB_NAME'
+              secretRef: 'db-name'
+            }
+            {
+              name: 'DB_USER'
+              secretRef: 'db-user'
+            }
+            {
+              name: 'DB_PASSWORD'
+              secretRef: 'db-password'
             }
             {
               name: 'STORE_MODEL_IN_DB'

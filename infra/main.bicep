@@ -115,7 +115,11 @@ module litellm './app/litellm.bicep' = {
     name: containerAppName
     containerAppsEnvironmentName: appsEnv.outputs.name
     // keyvaultName: keyvault.outputs.name
-    postgresqlConnectionString: 'postgresql://${databaseUser}:${databasePassword}@${databaseHost}:${databasePort}/${databaseName}'
+    databaseHost: databaseHost
+    databasePort: databasePort
+    databaseName: databaseName
+    databaseUser: databaseUser
+    databasePassword: databasePassword
     litellm_master_key: litellm_master_key
     litellm_salt_key: litellm_salt_key
 

@@ -21,6 +21,9 @@ COPY requirements.txt .
 RUN --mount=type=cache,target=${HOME}/.cache/pip \
     ${HOME}/venv/bin/pip install -r requirements.txt
 
+# Generate Prisma client
+RUN ${HOME}/venv/bin/prisma generate
+
 COPY config.yaml .
 COPY entrypoint.sh .
 

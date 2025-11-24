@@ -21,15 +21,21 @@ param containerMinReplicaCount int = 2
 @description('Maximum replica count for LiteLLM containers.')
 param containerMaxReplicaCount int = 3
 
+@description('Host/FQDN of the existing PostgreSQL server.')
+param databaseHost string
+
+@description('Port of the existing PostgreSQL server.')
+param databasePort string = '5432'
+
 @description('Name of the PostgreSQL database.')
 param databaseName string = 'litellmdb'
 
-@description('Name of the PostgreSQL database admin user.')
-param databaseAdminUser string = 'litellmuser'
+@description('Username for the PostgreSQL database.')
+param databaseUser string
 
-@description('Password for the PostgreSQL database admin user.')
+@description('Password for the PostgreSQL database user.')
 @secure()
-param databaseAdminPassword string
+param databasePassword string
 
 param litellmContainerAppExists bool
 
@@ -90,28 +96,7 @@ module appsEnv './shared/apps-env.bicep' = {
   scope: rg
 }
 
-// Deploy PostgreSQL Server via module call.
-module postgresql './shared/postgresql.bicep' = {
-  name: 'postgresql'
-  params: {
-    name: '${abbrs.dBforPostgreSQLServers}litellm-${resourceToken}'
-    location: location
-    tags: tags
-    databaseAdminUser: databaseAdminUser
-    databaseAdminPassword: databaseAdminPassword
-  }
-  scope: rg
-}
-
-// Deploy PostgreSQL Database via module call.
-module postgresqlDatabase './shared/postgresql_database.bicep' = {
-  name: 'postgresqlDatabase'
-  params: {
-    serverName: postgresql.outputs.name
-    databaseName: databaseName
-  }
-  scope: rg
-}
+// Using existing PostgreSQL database - no provisioning needed
 
 // module keyvault './shared/keyvault.bicep' = {
 //   name: 'keyvault'
@@ -130,7 +115,7 @@ module litellm './app/litellm.bicep' = {
     name: containerAppName
     containerAppsEnvironmentName: appsEnv.outputs.name
     // keyvaultName: keyvault.outputs.name
-    postgresqlConnectionString: 'postgresql://${databaseAdminUser}:${databaseAdminPassword}@${postgresql.outputs.fqdn}/${databaseName}'
+    postgresqlConnectionString: 'postgresql://${databaseUser}:${databasePassword}@${databaseHost}:${databasePort}/${databaseName}'
     litellm_master_key: litellm_master_key
     litellm_salt_key: litellm_salt_key
 

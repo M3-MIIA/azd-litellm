@@ -16,21 +16,37 @@ To use this template, follow these steps using the [Azure Developer CLI](https:/
     azd init --template build5nines/azd-litellm
     ```
 
-3. Use `azd up` to provision your Azure infrastructure and deploy the web application to Azure.
+3. Configure your existing PostgreSQL database connection. Set the following environment variables with your database credentials:
+
+    ```bash
+    azd env set DATABASE_HOST "your-postgres-host.example.com"
+    azd env set DATABASE_PORT "5432"
+    azd env set DATABASE_NAME "litellmdb"
+    azd env set DATABASE_USER "your-database-user"
+    azd env set DATABASE_PASSWORD "your-secure-password"
+    ```
+
+    **Important notes:**
+    - Replace the values above with your actual PostgreSQL connection details
+    - This template uses an **existing PostgreSQL database** - it will not create a new database server
+    - Make sure your PostgreSQL server allows connections from Azure services
+    - LiteLLM will automatically initialize the required tables on first run
+    - The database port defaults to `5432` if not specified
+
+4. Use `azd up` to provision your Azure infrastructure and deploy the web application to Azure.
 
     ```bash
     azd up
     ```
 
-4. `azd up` will prompt you to enter these additional secret and password parameters used to configure LiteLLM:
+5. `azd up` will prompt you to enter these additional secret and password parameters used to configure LiteLLM:
 
-    - `databaseAdminPassword`: The Admin password use to connect to the PostgreSQL database.
     - `litellm_master_key`: The LiteLLM Master Key. This is the LiteLLM proxy admin key.
     - `litellm_salt_key`: The LiteLLM Salt Key. This cannot be changed once set, and is used to encrypt model keys in the database.
 
     Be sure to save these secrets and passwords to keep them safe.
 
-5. Once the template has finished provisioning all resources, and Azure Container Apps has completed deploying the LiteLLM container _(this can take a minute or so after `azd up` completes to finish)_, you can access both the Swagger UI and Admin UI for LiteLLM.
+6. Once the template has finished provisioning all resources, and Azure Container Apps has completed deploying the LiteLLM container _(this can take a minute or so after `azd up` completes to finish)_, you can access both the Swagger UI and Admin UI for LiteLLM.
 
     This can be done by navigating to the `litellm` service **Endpoint** returned from the `azd` deployment step using your web browser. _You can also find this endpoint by navigating to the **Container App** within the **Azure Portal** then locating the **Application Url**._
 
@@ -56,9 +72,10 @@ These are the Azure resources that are deployed with this template:
 
 - **Container Apps Environment** - The environment for hosting the Container App
 - **Container App** - The hosting for the [LiteLLM](https://www.litellm.ai) Docker Container
-- **Azure Database for PostgreSQL flexible server** - The PostgreSQL server to host the LiteLLM database
 - **Log Analytics** and **Application Insights** - Logging for the Container Apps Environment
 - **Container Registry** - Used to deploy the custom Docker container for LiteLLM
+
+**Note:** This template is configured to use an **existing PostgreSQL database** that you provide. It does not provision a new PostgreSQL server in Azure.
 
 ## How to use Specific Version of LiteLLM
 

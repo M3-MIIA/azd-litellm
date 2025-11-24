@@ -10,6 +10,21 @@
       },
       "litellmContainerAppExists": {
         "value": "${LITELLM_CONTAINER_APP_EXISTS=false}"
+      },
+      "databaseHost": {
+        "value": "${DATABASE_HOST}"
+      },
+      "databasePort": {
+        "value": "${DATABASE_PORT=5432}"
+      },
+      "databaseName": {
+        "value": "${DATABASE_NAME=litellmdb}"
+      },
+      "databaseUser": {
+        "value": "${DATABASE_USER}"
+      },
+      "databasePassword": {
+        "value": "${DATABASE_PASSWORD}"
       }
     }
   }

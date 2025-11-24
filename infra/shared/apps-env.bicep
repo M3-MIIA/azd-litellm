@@ -5,7 +5,7 @@ param tags object = {}
 param logAnalyticsWorkspaceName string
 param applicationInsightsName string = ''
 
-resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2024-03-01' = {
+resource containerAppsEnvironment 'Microsoft.App/managedEnvironments@2025-07-01' = {
   name: name
   location: location
   tags: tags
@@ -31,3 +31,4 @@ resource applicationInsights 'Microsoft.Insights/components@2020-02-02' existing
 
 output name string = containerAppsEnvironment.name
 output domain string = containerAppsEnvironment.properties.defaultDomain
+output staticIp string = containerAppsEnvironment.properties.staticIp

@@ -118,6 +118,96 @@ To use a different branch or fork, edit line 8 of `/src/litellm/DOCKERFILE`:
 RUN git clone --branch YOUR_BRANCH --depth 1 https://github.com/YOUR_USERNAME/litellm.git
 ```
 
+## Custom Domain Configuration (Optional)
+
+You can configure a custom domain (like `api.yourdomain.com`) for your LiteLLM deployment with automatic SSL certificate management.
+
+### Quick Setup
+
+**Step 1: Configure your domain**
+
+```bash
+azd env set CUSTOM_DOMAIN_NAME "api.yourdomain.com"
+```
+
+**Step 2: Deploy**
+
+```bash
+azd up
+```
+
+**Step 3: Get DNS configuration values**
+
+After deployment, get the values you need for DNS:
+
+```bash
+azd env get-values | grep LITELLM_DEFAULT_FQDN
+azd env get-values | grep LITELLM_DOMAIN_VERIFICATION_CODE
+```
+
+**Step 4: Configure DNS records**
+
+In your DNS provider (GoDaddy, Cloudflare, Route53, etc.), create these two records:
+
+1. **CNAME Record**:
+   - Host/Name: `api` (your subdomain)
+   - Value/Points to: `<LITELLM_DEFAULT_FQDN>` (from step 3)
+   - TTL: 3600
+
+2. **TXT Record**:
+   - Host/Name: `asuid.api` (asuid + your subdomain)
+   - Value: `<LITELLM_DOMAIN_VERIFICATION_CODE>` (from step 3)
+   - TTL: 3600
+
+**Step 5: Wait for certificate**
+
+- DNS propagation: 5-60 minutes
+- Certificate issuance: 5-15 minutes after DNS validates
+- Your site will be available at `https://api.yourdomain.com`
+
+### Features
+
+- ✅ **Free SSL certificates** - Automatically issued and renewed by Azure
+- ✅ **Zero downtime** - Default Azure domain continues working
+- ✅ **Simple DNS** - Just CNAME + TXT records
+- ✅ **Automatic renewal** - Certificates renew before expiration
+
+### Verification
+
+Check if your custom domain is working:
+
+```bash
+# Test the endpoint
+curl https://api.yourdomain.com/health
+
+# Check certificate
+curl -I https://api.yourdomain.com
+```
+
+### Troubleshooting
+
+**Certificate not issuing?**
+- Verify DNS records with: `dig api.yourdomain.com CNAME`
+- Verify TXT record with: `dig asuid.api.yourdomain.com TXT`
+- Wait 15-30 minutes for DNS propagation
+
+**Still having issues?**
+- Ensure CNAME points directly to Azure domain (not through CDN)
+- Check that TXT value matches exactly (no extra spaces)
+- If using Cloudflare, set CNAME to "DNS only" (grey cloud) initially
+
+### DNS Provider Notes
+
+**Cloudflare**:
+- Set CNAME to "DNS only" (grey cloud) during setup
+- Enable proxy (orange cloud) only AFTER certificate is issued
+
+**GoDaddy/Namecheap**:
+- Use subdomain name only (e.g., `api`, not `api.yourdomain.com`)
+
+**AWS Route 53**:
+- Use fully qualified names with trailing dots (e.g., `asuid.api.yourdomain.com.`)
+
 ## Author
 
 This `azd` template was written by [Chris Pietschmann](https://pietschsoft.com), founder of [Build5Nines](https://build5nines.com), Microsoft MVP, HashiCorp Ambassador, and Microsoft Certified Trainer (MCT).

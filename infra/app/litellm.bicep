@@ -54,6 +54,13 @@ param litellm_salt_key string
 
 param litellmContainerAppExists bool
 
+@description('Custom domain name for the app (optional). Leave empty for default Azure domain.')
+param customDomainName string = ''
+
+@description('Domain validation method for managed certificate.')
+@allowed(['CNAME', 'HTTP'])
+param domainValidationMethod string = 'CNAME'
+
 var abbrs = loadJsonContent('../abbreviations.json')
 var identityName = '${abbrs.managedIdentityUserAssignedIdentities}${name}'
 
@@ -134,7 +141,7 @@ module fetchLatestContainerImage '../shared/fetch-container-image.bicep' = {
 //   }
 // }
 
-resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
+resource containerApp 'Microsoft.App/containerApps@2025-07-01' = {
   name: name
   location: location
   tags: union(tags, {'azd-service-name':  'litellm' })
@@ -149,6 +156,12 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
         external: true
         targetPort: containerPort
         transport: 'auto'
+        customDomains: empty(customDomainName) ? [] : [
+          {
+            name: customDomainName
+            bindingType: 'Auto'
+          }
+        ]
       }
       registries: [
         {
@@ -244,6 +257,23 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
   }
 }
 
+resource managedCertificate 'Microsoft.App/managedEnvironments/managedCertificates@2025-07-01' = if (!empty(customDomainName)) {
+  parent: containerAppsEnvironment
+  name: '${containerAppsEnvironment.name}-${replace(customDomainName, '.', '-')}-cert'
+  location: location
+  tags: tags
+  properties: {
+    subjectName: customDomainName
+    domainControlValidation: domainValidationMethod
+  }
+  dependsOn: [
+    containerApp
+  ]
+}
+
 output containerAppName string = containerApp.name
 output containerAppFQDN string = containerApp.properties.configuration.ingress.fqdn
+output domainVerificationCode string = containerApp.properties.customDomainVerificationId
+output customDomainConfigured bool = !empty(customDomainName)
+output customDomainName string = customDomainName
 

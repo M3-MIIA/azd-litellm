@@ -25,6 +25,12 @@
       },
       "databasePassword": {
         "value": "${DATABASE_PASSWORD}"
+      },
+      "customDomainName": {
+        "value": "${CUSTOM_DOMAIN_NAME=}"
+      },
+      "domainValidationMethod": {
+        "value": "${DOMAIN_VALIDATION_METHOD=CNAME}"
       }
     }
   }

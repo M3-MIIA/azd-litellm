@@ -47,6 +47,13 @@ param litellm_master_key string
 @secure()
 param litellm_salt_key string
 
+@description('Custom domain name for the LiteLLM app (optional). Leave empty to use default Azure domain. Example: api.yourdomain.com')
+param customDomainName string = ''
+
+@description('Domain validation method: CNAME for subdomains (recommended) or HTTP for apex domains')
+@allowed(['CNAME', 'HTTP'])
+param domainValidationMethod string = 'CNAME'
+
 var abbrs = loadJsonContent('./abbreviations.json')
 var resourceToken = toLower(uniqueString(subscription().id, resourceGroupName, environmentName, location))
 var tags = {
@@ -129,6 +136,10 @@ module litellm './app/litellm.bicep' = {
     containerPort: containerPort
     containerMinReplicaCount: containerMinReplicaCount
     containerMaxReplicaCount: containerMaxReplicaCount
+
+    // Custom domain parameters
+    customDomainName: customDomainName
+    domainValidationMethod: domainValidationMethod
   }
   scope: rg
 }
@@ -137,6 +148,11 @@ module litellm './app/litellm.bicep' = {
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.outputs.loginServer
 output LITELLM_MASTER_KEY string = litellm_master_key
 output LITELLM_SALT_KEY string = litellm_salt_key
+
+// Container App endpoints
+output LITELLM_DEFAULT_FQDN string = litellm.outputs.containerAppFQDN
+output LITELLM_CUSTOM_DOMAIN string = !empty(customDomainName) ? customDomainName : litellm.outputs.containerAppFQDN
+output LITELLM_DOMAIN_VERIFICATION_CODE string = litellm.outputs.domainVerificationCode
 
 //output LITELLM_CONTAINER_APP_EXISTS bool = true
 // output LITELLM_CONTAINERAPP_FQDN string = litellm.outputs.containerAppFQDN

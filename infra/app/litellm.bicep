@@ -141,7 +141,18 @@ module fetchLatestContainerImage '../shared/fetch-container-image.bicep' = {
 //   }
 // }
 
-resource containerApp 'Microsoft.App/containerApps@2025-07-01' = {
+resource managedCertificate 'Microsoft.App/managedEnvironments/managedCertificates@2024-03-01' = if (!empty(customDomainName)) {
+  parent: containerAppsEnvironment
+  name: '${containerAppsEnvironment.name}-${replace(customDomainName, '.', '-')}-cert'
+  location: location
+  tags: tags
+  properties: {
+    subjectName: customDomainName
+    domainControlValidation: domainValidationMethod
+  }
+}
+
+resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
   name: name
   location: location
   tags: union(tags, {'azd-service-name':  'litellm' })
@@ -159,7 +170,8 @@ resource containerApp 'Microsoft.App/containerApps@2025-07-01' = {
         customDomains: empty(customDomainName) ? [] : [
           {
             name: customDomainName
-            bindingType: 'Auto'
+            certificateId: !empty(customDomainName) ? managedCertificate.id : null
+            bindingType: 'SniEnabled'
           }
         ]
       }
@@ -255,20 +267,6 @@ resource containerApp 'Microsoft.App/containerApps@2025-07-01' = {
       }
     }
   }
-}
-
-resource managedCertificate 'Microsoft.App/managedEnvironments/managedCertificates@2025-07-01' = if (!empty(customDomainName)) {
-  parent: containerAppsEnvironment
-  name: '${containerAppsEnvironment.name}-${replace(customDomainName, '.', '-')}-cert'
-  location: location
-  tags: tags
-  properties: {
-    subjectName: customDomainName
-    domainControlValidation: domainValidationMethod
-  }
-  dependsOn: [
-    containerApp
-  ]
 }
 
 output containerAppName string = containerApp.name

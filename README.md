@@ -77,19 +77,46 @@ These are the Azure resources that are deployed with this template:
 
 **Note:** This template is configured to use an **existing PostgreSQL database** that you provide. It does not provision a new PostgreSQL server in Azure.
 
-## How to use Specific Version of LiteLLM
+## Custom LiteLLM Branch
 
-By default, this project uses the latest version of LiteLLM. There may be reasons you want to run a specific version of LiteLLM. This project deploys LiteLLM using its Python package, and you can update the version referenced to target a specific version of LiteLLM if necessary.
+**Note:** This template has been modified to use a custom LiteLLM branch instead of the official PyPI package.
 
-To do so, you can edit the [`/src/litellm/requirements.txt`](/src/litellm/requirements.txt) file. This file is the Python `pip` requirements file that specifies the PIP packages and their versions to use. The `litellm[proxy]` package is the package that is LiteLLM. You can find the available release versions on the [`litellm` PIP package page.](https://pypi.org/project/litellm/)
+The Docker build process clones and installs LiteLLM from:
+- **Repository:** https://github.com/AriOliv/litellm
+- **Branch:** `premium-side`
 
-Here's an example of the `requirements.txt` file reference of `litellm` package specifying the v1.65.1 release:
+The DOCKERFILE uses a multi-stage build approach:
+1. **Builder stage:** Clones the custom branch from GitHub
+2. **Runtime stage:** Installs LiteLLM from the cloned source
 
-```text
-litellm[proxy]==1.65.1
+### Updating the Custom Branch
+
+When the `premium-side` branch is updated with new changes, you'll need to rebuild and redeploy:
+
+```bash
+azd deploy litellm
 ```
 
-By default, this project does not specify a version; which tells PIP to pull down the latest release. I hope this helps if you find yourself needing to run a specific version of LiteLLM.
+This will:
+- Clone the latest code from the `premium-side` branch
+- Build a new container image
+- Deploy to Azure Container Apps
+
+### Switching Back to Official PyPI Version
+
+To revert to the official LiteLLM package:
+
+1. Edit `/src/litellm/DOCKERFILE` to remove the builder stage
+2. Add `litellm[proxy]` back to `/src/litellm/requirements.txt`
+3. Redeploy with `azd deploy litellm`
+
+### Using a Different Branch or Repository
+
+To use a different branch or fork, edit line 8 of `/src/litellm/DOCKERFILE`:
+
+```dockerfile
+RUN git clone --branch YOUR_BRANCH --depth 1 https://github.com/YOUR_USERNAME/litellm.git
+```
 
 ## Author
 

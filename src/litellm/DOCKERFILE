@@ -21,8 +21,8 @@ COPY requirements.txt .
 RUN --mount=type=cache,target=${HOME}/.cache/pip \
     ${HOME}/venv/bin/pip install -r requirements.txt
 
-# Generate Prisma client
-RUN ${HOME}/venv/bin/prisma generate
+# Generate Prisma client from the schema included in the litellm package
+RUN ${HOME}/venv/bin/prisma generate --schema ${HOME}/venv/lib/python*/site-packages/litellm/proxy/schema.prisma
 
 COPY config.yaml .
 COPY entrypoint.sh .

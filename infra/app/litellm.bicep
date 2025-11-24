@@ -229,6 +229,10 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
               name: 'STORE_MODEL_IN_DB'
               value: 'True'
             }
+            {
+              name: 'LITELLM_PREMIUM_FEATURES'
+              value: 'advanced_rate_limiting,managed_files,sso_auth,custom_guardrails,blocked_users,team_management,audit_logging,budget_tracking,prometheus_metrics,custom_callbacks,email_notifications,vector_store_acl,advanced_dashboard'
+            }
           ]
         }
       ]

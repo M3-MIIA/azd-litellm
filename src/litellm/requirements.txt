@@ -1,3 +1,7 @@
 prometheus_client
 langfuse
 prisma
+opentelemetry-api
+opentelemetry-sdk
+# opentelemetry-exporter
+# opentelemetry-propagator

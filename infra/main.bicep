@@ -19,7 +19,7 @@ param containerPort int = 80
 param containerMinReplicaCount int = 2
 
 @description('Maximum replica count for LiteLLM containers.')
-param containerMaxReplicaCount int = 3
+param containerMaxReplicaCount int = 10
 
 @description('Host/FQDN of the existing PostgreSQL server.')
 param databaseHost string
@@ -46,6 +46,25 @@ param litellm_master_key string
 @description('Salt key for LiteLLM. (CAN NOT CHANGE ONCE SET)')
 @secure()
 param litellm_salt_key string
+
+@description('OpenAI API key.')
+@secure()
+param openai_api_key string
+
+@description('Anthropic API key.')
+@secure()
+param anthropic_api_key string
+
+@description('Azure AI Foundry API key.')
+@secure()
+param azure_ai_foundry_api_key string
+
+@description('Azure AI Foundry API base URL.')
+param azure_ai_foundry_api_base string
+
+@description('Groq API key.')
+@secure()
+param groq_api_key string
 
 @description('Custom domain name for the LiteLLM app (optional). Leave empty to use default Azure domain. Example: api.yourdomain.com')
 param customDomainName string = ''
@@ -129,6 +148,11 @@ module litellm './app/litellm.bicep' = {
     databasePassword: databasePassword
     litellm_master_key: litellm_master_key
     litellm_salt_key: litellm_salt_key
+    openai_api_key: openai_api_key
+    anthropic_api_key: anthropic_api_key
+    azure_ai_foundry_api_key: azure_ai_foundry_api_key
+    azure_ai_foundry_api_base: azure_ai_foundry_api_base
+    groq_api_key: groq_api_key
 
     litellmContainerAppExists: litellmContainerAppExists
 
@@ -146,8 +170,6 @@ module litellm './app/litellm.bicep' = {
 
 
 output AZURE_CONTAINER_REGISTRY_ENDPOINT string = containerRegistry.outputs.loginServer
-output LITELLM_MASTER_KEY string = litellm_master_key
-output LITELLM_SALT_KEY string = litellm_salt_key
 
 // Container App endpoints
 output LITELLM_DEFAULT_FQDN string = litellm.outputs.containerAppFQDN

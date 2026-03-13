@@ -26,6 +26,27 @@
       "databasePassword": {
         "value": "${DATABASE_PASSWORD}"
       },
+      "litellm_master_key": {
+        "value": "${LITELLM_MASTER_KEY}"
+      },
+      "litellm_salt_key": {
+        "value": "${LITELLM_SALT_KEY}"
+      },
+      "openai_api_key": {
+        "value": "${OPENAI_API_KEY}"
+      },
+      "anthropic_api_key": {
+        "value": "${ANTHROPIC_API_KEY}"
+      },
+      "azure_ai_foundry_api_key": {
+        "value": "${AZURE_AI_FOUNDRY_API_KEY}"
+      },
+      "azure_ai_foundry_api_base": {
+        "value": "${AZURE_AI_FOUNDRY_API_BASE=https://miia-resource.cognitiveservices.azure.com}"
+      },
+      "groq_api_key": {
+        "value": "${GROQ_API_KEY}"
+      },
       "customDomainName": {
         "value": "${CUSTOM_DOMAIN_NAME=}"
       },

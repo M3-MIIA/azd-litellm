@@ -52,6 +52,25 @@ param litellm_master_key string
 @secure()
 param litellm_salt_key string
 
+@description('OpenAI API key.')
+@secure()
+param openai_api_key string
+
+@description('Anthropic API key.')
+@secure()
+param anthropic_api_key string
+
+@description('Azure AI Foundry API key.')
+@secure()
+param azure_ai_foundry_api_key string
+
+@description('Azure AI Foundry API base URL.')
+param azure_ai_foundry_api_base string
+
+@description('Groq API key.')
+@secure()
+param groq_api_key string
+
 param litellmContainerAppExists bool
 
 @description('Custom domain name for the app (optional). Leave empty for default Azure domain.')
@@ -214,6 +233,22 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
           name: 'db-password'
           value: databasePassword
         }
+        {
+          name: 'openai-api-key'
+          value: openai_api_key
+        }
+        {
+          name: 'anthropic-api-key'
+          value: anthropic_api_key
+        }
+        {
+          name: 'azure-ai-foundry-api-key'
+          value: azure_ai_foundry_api_key
+        }
+        {
+          name: 'groq-api-key'
+          value: groq_api_key
+        }
       ]
     }
     template: {
@@ -221,6 +256,10 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
         {
           name: containerName
           image: fetchLatestContainerImage.outputs.?containers[?0].?image ?? 'mcr.microsoft.com/azuredocs/containerapps-helloworld:latest'
+          resources: {
+            cpu: json('2.0')
+            memory: '4.0Gi'
+          }
           env: [
             {
               name: 'LITELLM_MASTER_KEY'
@@ -251,6 +290,26 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
               secretRef: 'db-password'
             }
             {
+              name: 'OPENAI_API_KEY'
+              secretRef: 'openai-api-key'
+            }
+            {
+              name: 'ANTHROPIC_API_KEY'
+              secretRef: 'anthropic-api-key'
+            }
+            {
+              name: 'AZURE_AI_FOUNDRY_API_KEY'
+              secretRef: 'azure-ai-foundry-api-key'
+            }
+            {
+              name: 'AZURE_AI_FOUNDRY_API_BASE'
+              value: azure_ai_foundry_api_base
+            }
+            {
+              name: 'GROQ_API_KEY'
+              secretRef: 'groq-api-key'
+            }
+            {
               name: 'STORE_MODEL_IN_DB'
               value: 'True'
             }
@@ -264,6 +323,16 @@ resource containerApp 'Microsoft.App/containerApps@2024-03-01' = {
       scale: {
         minReplicas: containerMinReplicaCount
         maxReplicas: containerMaxReplicaCount
+        rules: [
+          {
+            name: 'http-scaling'
+            http: {
+              metadata: {
+                concurrentRequests: '100'
+              }
+            }
+          }
+        ]
       }
     }
   }

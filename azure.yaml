@@ -10,7 +10,7 @@ infra:
     - name: containerMinReplicaCount
       value: 1
     - name: containerMaxReplicaCount
-      value: 1
+      value: 3
 
 services:
   litellm:

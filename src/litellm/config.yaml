@@ -33,6 +33,7 @@ model_list:
   - model_name: gpt-4.1-mini
     litellm_params:
       model: azure/gpt-4.1-mini
+      base_model: azure/gpt-4.1-mini
       api_key: os.environ/AZURE_AI_FOUNDRY_API_KEY
       api_base: os.environ/AZURE_AI_FOUNDRY_API_BASE
       api_version: "2025-01-01-preview"
@@ -40,6 +41,7 @@ model_list:
   - model_name: gpt-4o
     litellm_params:
       model: azure/gpt-4o
+      base_model: azure/gpt-4o
       api_key: os.environ/AZURE_AI_FOUNDRY_API_KEY
       api_base: os.environ/AZURE_AI_FOUNDRY_API_BASE
       api_version: "2025-01-01-preview"
@@ -47,6 +49,7 @@ model_list:
   - model_name: gpt-4.1
     litellm_params:
       model: azure/gpt-4.1-2025-04-14
+      base_model: azure/gpt-4.1
       api_key: os.environ/AZURE_AI_FOUNDRY_API_KEY
       api_base: os.environ/AZURE_AI_FOUNDRY_API_BASE
       api_version: "2025-01-01-preview"
@@ -54,6 +57,7 @@ model_list:
   - model_name: text-embedding-3-large
     litellm_params:
       model: azure/text-embedding-3-large
+      base_model: azure/text-embedding-3-large
       api_key: os.environ/AZURE_AI_FOUNDRY_API_KEY
       api_base: os.environ/AZURE_AI_FOUNDRY_API_BASE
       api_version: "2025-01-01-preview"
